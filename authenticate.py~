@@ -8,4 +8,4 @@ def authenticate(uname,passw):
  	response = urllib.urlopen(url+'?'+data)
   	data = json.loads(response.read())
  	return data['fields'][0]
-print authenticate('Nandan','asd')
+print authenticate('11110052','abcd')
