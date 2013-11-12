@@ -10,4 +10,4 @@ def online_users(uname,passw):
 	for d in data['fields']:
 		users_pre[d['user_name']]=d['presence']
 	return users_pre
-print online_users('Mayank','abc')
+print online_users('Nandan','bab')
