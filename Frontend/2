@@ -1,0 +1,38 @@
+class Employee(object):
+    def __init__(self, name, salary):
+        self._name = name
+        self._salary = salary
+
+    def my_name(self):
+        return self._name
+
+    def wage(self):
+        return self._salary/26   # fortnight pay
+    def __str__(self):
+        return self._name
+
+class Worker(Employee):
+    def __init__(self, name, salary, manager):
+        Employee.__init__(self, name, salary)
+        self._manager = manager
+
+    def getManager(self):
+        return self._manager
+
+class Executive(Employee):
+    def __init__(self, name, salary, yearlyBonus):
+        Employee.__init__(self, name, salary)
+        self._yearlyBonus = yearlyBonus
+
+    def wage(self):
+        return Employee.wage(self) + self._yearlyBonus/26
+
+    def yearlyBonus(self):
+        return self._yearlyBonus
+    def __str__(self):
+        return str(self._salary)
+        return str(self._yearlyBonus)
+
+s=Executive('Raj', 123456,34)
+print s._name
+print s
