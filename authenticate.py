@@ -1,6 +1,5 @@
-
 import urllib,json
-url='http://127.0.0.1:8000/data/authenticate/'
+url='http://192.168.7.250:8009/data/authenticate/'
 
 def authenticate(uname,passw):
 	time=None
@@ -11,5 +10,3 @@ def authenticate(uname,passw):
 	if(data['fields'][0]==1):
 		time=data['fields'][1]
  	return data['fields'][0],time
-
-print authenticate(a,'abc')

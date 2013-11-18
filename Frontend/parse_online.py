@@ -1,5 +1,5 @@
 import urllib,json,time
-url='http://192.168.7.250:8012/data/onpre/'
+url='http://192.168.7.250:8000/data/onpre/'
 
 def online_users(uname,passw):
         users_pre=dict()

@@ -1,18 +1,20 @@
 import wx
+from parse_online import *
 from wx.lib.scrolledpanel import ScrolledPanel
 import authenticate
-onoffdict = {'Vinit Joshi':1, 'Nandan Vora':0,'Raj Shah':1,'Vinit Joshiq':1, 'Nandaxn Vora':0,'Racj Shah':0,
-                 'Vinidt Joshi':1, 'Nanddan Vora':0,'Raj Shachs':0, 'Vdinit Joshi':1,
-                 'Nandan Vgtora':0,'Raj Sdhah':1,'Vinit Jos1hiq':1, 'Nan1daxn Vora':0,'Ra1cj Shah':0,
-                 'Vinidt Jos1hi':1, 'Nan1ddan Vora':0,'Raj Shac1h':0}
+import messages_frontEnd as mf
+import os
+
+
  ########################################################################
 class ChatScreen(wx.Frame):
-    def __init__(self, user, friend, *args, **style):
+    def __init__(self, user, passw, friend, *args, **style):
         style["style"] = wx.DEFAULT_FRAME_STYLE
         wx.Frame.__init__(self, *args, **style)
         self.chat_log = wx.TextCtrl(self, -1, "", style=wx.TE_MULTILINE | wx.TE_READONLY)
         self.text_send = wx.TextCtrl(self, -1, "")
         self.user=user
+        self.passw=passw
         self.friend=friend
         self.__set_properties()
         self.__do_layout()
@@ -21,14 +23,13 @@ class ChatScreen(wx.Frame):
         
 
     def __set_chatlog(self):
-        directory='C:\Users\Manish\Desktop'
-        if (self.user<self.friend):
-            filename=str(self.user)+'_'+str(self.friend)
-        else:
-            filename=str(self.friend)+'_'+str(self.user)
-##        filename='test.txt'
-        fh=open('/'.join((directory, filename)),"a+")
-        fh.close()
+        directory=os.getcwd()+ '/messages'
+        filename=str(self.user)+'_'+str(self.friend)
+        messages = mf.getMessage(self.user, self.friend, self.passw)
+        mf.makeTextFile(self.user, self.friend, self.passw, messages)
+####        filename='test.txt'
+##        fh=open('/'.join((directory, filename)),"a+")
+##        fh.close()
         self.chat_log.LoadFile('/'.join((directory, filename)))
         
     def __set_properties(self):
@@ -50,17 +51,16 @@ class ChatScreen(wx.Frame):
         
 
     def text_e(self, event):
-        directory='C:\Users\Manish\Desktop'
+        directory=os.getcwd()+ '/messages'
 ##        filename='test.txt'
-        if (self.user<self.friend):
-            filename=str(self.user)+'_'+str(self.friend)
-        else:
-            filename=str(self.friend)+'_'+str(self.user)
-        fh=open('/'.join((directory, filename)),"a+")
+        filename=str(self.user)+'_'+str(self.friend)
+##        fh=open('/'.join((directory, filename)),"a+")
         text = self.text_send.GetValue()
-        fh.write("\n"+text)
-        fh.flush()
-        fh.close()
+##        fh.write("\n"+text)
+##        fh.flush()
+        messages = mf.addMessage(self.user, self.friend, self.passw, text)
+        mf.makeTextFile(self.user, self.friend, self.passw, messages)
+##        fh.close()
         
         self.chat_log.LoadFile('/'.join((directory, filename)))
         self.text_send.SetValue("")
@@ -69,24 +69,24 @@ class ChatScreen(wx.Frame):
 
  ########################################################################
 class OnlineOfflineScreen(wx.Frame):
-    def __init__(self,user,dictionary):
+    def __init__(self,user,passw,dictionary):
         self.d=dictionary
         self.user = user
+        self.passw=passw
         wx.Frame.__init__(self, None, -1, 'Friends', 
                 size=(500, 350))
-        self.panel = ScrolledPanel(self, size = wx.Size( 600, 400 ))
+        self.panel = ScrolledPanel(self, size = wx.Size( 500, 350 ))
         self.panel.SetupScrolling()
         self.boxsizer = wx.BoxSizer(wx.VERTICAL)
-        self.sizer = wx.FlexGridSizer(5,5,5,5)
+        self.sizer = wx.FlexGridSizer(5,3,5,5)
         self.createButton()
         self.Centre()
         self.Show()
     def createButton(self):
         a=self.d
         for key in a:
-            i=0
             if(a[key]==1):
-                b = wx.Button(self.panel, i, key) #creates a button
+                b = wx.Button(self.panel, -1, key) #creates a button
                 b.Enable(True)
                 b.SetBackgroundColour('#89E398') 
                 self.sizer.Add(b,0,wx.EXPAND)
@@ -95,20 +95,19 @@ class OnlineOfflineScreen(wx.Frame):
                 self.panel.SetSizer(self.sizer)
                 
             elif(a[key]==0):
-                b = wx.Button(self.panel, i, key)
+                b = wx.Button(self.panel, -1, key)
                 b.Enable(True)
                 self.sizer.Add(b,0,wx.EXPAND)
                 b.parameterVal=key
                 b.Bind(wx.EVT_BUTTON,self.OnB)
                 self.panel.SetSizer(self.sizer)
-        i=i+1
                 
     def OnB(self, event):
         bp = event.GetEventObject()
         friend = bp.parameterVal
         app1 = wx.PySimpleApp(0)
         wx.InitAllImageHandlers()
-        frame_1 = ChatScreen(self.user, friend, None, -1, "")
+        frame_1 = ChatScreen(self.user, self.passw,friend, None, -1, "")
         app1.SetTopWindow(frame_1)
         frame_1.Show()
         app1.MainLoop()
@@ -200,7 +199,7 @@ class login_panel(wx.Panel):
         self.panel.SetSizer(sizer)
 
     def OnSignup(self, event):
-        href="http://192.168.7.250:8009/signup/"
+        href="http://192.168.7.250:8000/signup/"
         wx.BeginBusyCursor() 
         import webbrowser 
         webbrowser.open(href) 
@@ -216,7 +215,13 @@ class login_panel(wx.Panel):
         elif flag==1:
             self.frame.Close(True)
             app = wx.App(False)
-            OnlineOfflineScreen(chat_login.UserText, onoffdict)
+            onoffdict = online_users(chat_login.UserText,chat_login.PasswordText)
+##            onoffdict={'Vinit Joshi':1, 'Nandan Vora':0,'Raj Shah':1,
+##                       'Vinit Joshi1':1, 'Nandan Vora1':0,'Raj Shah1':1,
+##                       'Vinit Joshi2':1, 'Nandan Vora2':0,'Raj Shah2':1,
+##                       'Vinit Joshi3':1, 'Nandan Vora3':0,'Raj Shah3':1,
+##                       'Vinit Joshi4':1, 'Nandan Vora4':0,'Raj Shah4':1,}
+            OnlineOfflineScreen(chat_login.UserText, chat_login.PasswordText, onoffdict)
 ##            Prototype(None, title='')
             app.MainLoop()
 if __name__ == '__main__':

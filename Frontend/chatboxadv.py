@@ -1,4 +1,5 @@
 import wx
+import os
 
  ########################################################################
 class MyFrame(wx.Frame):
@@ -38,7 +39,7 @@ class MyFrame(wx.Frame):
         
 
     def text_e(self, event):
-        directory='C:\Users\Manish\Desktop'
+        directory=os.getcwd()
         filename='test.txt'
         filename1='test1.txt'
         
