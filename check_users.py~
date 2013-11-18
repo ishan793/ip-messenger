@@ -5,6 +5,6 @@ def ping_server():
 	data = urllib.urlencode(query_args)
 	urllib.urlopen(url+'?'+data)
 	print 'modified'
-	time.sleep(10)
+	time.sleep(20)
 	ping_server()
 ping_server()

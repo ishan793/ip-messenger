@@ -16,6 +16,13 @@ def encodeToJson(data):
 def Authenticate(request):
 	tim=time.mktime(datetime.datetime.now().timetuple()) * 1000
 	if request.REQUEST.has_key('u_name') == True:
+		if(authHelper(request.REQUEST['u_name'],request.REQUEST['pass'])):		
+			d=OnlinePresence.objects.get(user_name=request.REQUEST['u_name'])
+			print d.presence,d.user_name,d.ping_time
+			d.user_name=request.REQUEST['u_name']
+			d.presence=1
+			d.ping_time=time.mktime(datetime.datetime.now().timetuple()) * 1000
+			d.save()		
 		data=encodeToJson({"auth":authHelper(request.REQUEST['u_name'],request.REQUEST['pass']),"time":tim})
 		return HttpResponse(data, mimetype = "application/json")
 		
@@ -79,7 +86,7 @@ def online_presence(request):
 
 def online_users():
         # changed here, correct later
-	data=SignUp.objects.all()
+	data=OnlinePresence.objects.all()
 	
 	return HttpResponse(encodeToJson(data), mimetype = "application/json")
 

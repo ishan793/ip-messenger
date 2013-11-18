@@ -3,12 +3,16 @@ import os
 import sys
 import time,sched
 from kthread import *
-
+import urllib,time
 def run_auth():
 	def on9_check():
-		import subprocess
-		subprocess.call("check_users.py", shell=True)
-		time.sleep(15)
+		#import subprocess
+		#subprocess.call("check_users.py", shell=True)
+		url='http://127.0.0.1:8017/data/flush/'
+		query_args = { 'u_name':'admin', 'pass':'chatdb' }
+		data = urllib.urlencode(query_args)
+		urllib.urlopen(url+'?'+data)
+		time.sleep(10)
 		on9_check()
 	on9_check()
 
