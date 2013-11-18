@@ -3,7 +3,6 @@ import os
 import sys
 import time,sched
 from kthread import *
-
 def run_auth():
 	def on9_check():
 		import subprocess

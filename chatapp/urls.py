@@ -6,8 +6,10 @@ urlpatterns = patterns('',
     #url(r'^$', views.index),
     url(r'^authenticate/$', views.Authenticate),
     url(r'^signup/$', views.register_user),
-	url(r'^flush/$', views.flush_all_presence),
-	url(r'^onpre/$', views.online_presence),
-	url(r'^onpresave/$', views.save_to_onpre),
+    url(r'^flush/$', views.flush_all_presence),
+    url(r'^onpre/$', views.online_presence),
+    url(r'^onpresave/$', views.save_to_onpre),
+    url(r'^messages/$',views.getMessage),
+    url(r'^setRead/$',views.setRead),
     
 )
