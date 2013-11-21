@@ -328,7 +328,7 @@ class login_panel(wx.Panel):
             self.frame.SetStatusText("Username not registered")
         elif flag==1:
             self.frame.Close(True)
-            app = wx.App(False)
+            app = wx.App(True)
             OnlineOfflineScreen(chat_login.UserText, chat_login.PasswordText)
             OnlineOfflineThread()
 
