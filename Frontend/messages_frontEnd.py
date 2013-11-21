@@ -22,22 +22,22 @@ def getMessage(sender,reciever,passw):
 
 
 def addMessage(sender,reciever,passw,message):
-	'''function to send a new message takes senders and receivers user name and password as arguments and returns a dictionary with updated message in it'''  
-    time=None
-    query_args = {'send_name':sender,'recieve_name':reciever,'pass':passw,'content':message}
-    data = urllib.urlencode(query_args)
+	'''function to send a new message takes senders and receivers user name and password as arguments and returns a dictionary with updated message in it'''
+	time=None
+	query_args = {'send_name':sender,'recieve_name':reciever,'pass':passw,'content':message}
+        data = urllib.urlencode(query_args)
     
-    response = urllib.urlopen(url+'?'+'addMessage=1&'+data)
-    data = json.loads(response.read())
-    data['fields'].sort(key=lambda x: x['message_send_time'])
+        response = urllib.urlopen(url+'?'+'addMessage=1&'+data)
+        data = json.loads(response.read())
+        data['fields'].sort(key=lambda x: x['message_send_time'])
     
-    return data['fields']
+        return data['fields']
 
 
 
 def makeTextFile(sender,reciever,passw, messages):
         '''makes text file given the sender receiver and sets message status as read on the server'''
-		text_file = open("messages/"+sender + "_"+ reciever , 'w')
+        text_file = open("messages/"+sender + "_"+ reciever , 'w')
         url_unread='http://192.168.7.250:8000/data/setRead/'
         for message in messages:
                 if sender==message['message_recieve_id'] and message['message_status']==0:
@@ -56,7 +56,7 @@ def makeTextFile(sender,reciever,passw, messages):
 def calculate_time(object): 
         '''function to return updates on when was the message recieved on the client
 		Input is send time of that message by other user and output is the when was the message recieved on this client'''
-		url='http://192.168.7.250:8000/data/gettime/'
+	url='http://192.168.7.250:8000/data/gettime/'
         response = urllib.urlopen(url) 
         data = json.loads(response.read()) 
         t=int(data['fields']) 
