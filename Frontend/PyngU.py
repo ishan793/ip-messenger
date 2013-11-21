@@ -324,6 +324,8 @@ class login_panel(wx.Panel):
         flag=authenticate.authenticate(chat_login.UserText,chat_login.PasswordText)
         if flag==0:
             self.frame.SetStatusText("Sorry")
+        elif flag==2:
+            self.frame.SetStatusText("Username not registered")
         elif flag==1:
             self.frame.Close(True)
             app = wx.App(False)
