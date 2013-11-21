@@ -8,15 +8,15 @@ from chatapp.models import *
 import json
 import datetime,time
 
-#time = int(datetime.datetime.now().strftime("%s")) * 1000
-
 def encodeToJson(data):
+	'''function that takes an Object and creates a JSON Object from this object'''
 	return '{"fields": ' + json.dumps(list(data.values()), cls=DjangoJSONEncoder) + "}"
 	
 def Authenticate(request):
+	'''Function that takes a HTTP request to check whether a user is registered or not and returns a JSON Http response corresponding to whether user name-password combination is right or not'''
 	tim=time.mktime(datetime.datetime.now().timetuple()) * 1000
 	if request.REQUEST.has_key('u_name') == True:
-		if(authHelper(request.REQUEST['u_name'],request.REQUEST['pass'])):		
+		if(authHelper(request.REQUEST['u_name'],request.REQUEST['pass'])==1):		
 			d=OnlinePresence.objects.get(user_name=request.REQUEST['u_name'])
 			print d.presence,d.user_name,d.ping_time
 			d.user_name=request.REQUEST['u_name']
@@ -28,6 +28,7 @@ def Authenticate(request):
 		
 ## Create view for the sign up page.
 def register_user(request):
+	'''Function to take a HTTP request and returns a SignUp portal to register new users'''
 	if request.POST:
 		form = SignUpForm(request.POST)
 		if form.is_valid():
@@ -47,6 +48,7 @@ def register_user(request):
 
 
 def save_to_onpre():
+	'''Function to save users name to Online Presence tables'''
 	signdata=SignUp.objects.all()
 	predata=OnlinePresence.objects.all()
 	ls=[]
@@ -65,14 +67,16 @@ def save_to_onpre():
 			online_pre.save()
 
 	
-## To be activated when registration is successful.
+
 def register_success(request):
+	'''To be activated when registration is successful takes a request and generates an HTTP response as output'''
 	save_to_onpre()
 	return render_to_response('register_success.html')
 
 	
 	
 def online_presence(request):
+	'''Function taking a HTTP request as input and  modifies value of request making user to online''' 
 	if request.REQUEST.has_key('u_name') == True:
 		if(authHelper(request.REQUEST['u_name'],request.REQUEST['pass'])):
 			d=OnlinePresence.objects.get(user_name=request.REQUEST['u_name'])
@@ -85,12 +89,13 @@ def online_presence(request):
 	return online_users()
 
 def online_users():
-        # changed here, correct later
+    '''Function called from online_presence to return a JSON HTTP response to show which users are online'''   
 	data=OnlinePresence.objects.all()
 	
 	return HttpResponse(encodeToJson(data), mimetype = "application/json")
 
 def flush_all_presence(request):
+	'''A function that takes an Http request to keep a check on users which are online and offline a client which has not interacted with the server in the past 30 seconds is modified as offline'''
 	if request.REQUEST.has_key('u_name') == True:
 		if(request.REQUEST['u_name']=='admin' and request.REQUEST['pass']=='chatdb'):
 			data=OnlinePresence.objects.all()
@@ -103,9 +108,11 @@ def flush_all_presence(request):
 					d.save()
 	return online_users()
 
-# in the url for the getMessage, add 'message'(for recieving message), 'addMessage' for adding new message, 'send_name' for sender id and 'recieve_name' for reciver id
-# url for adding messages - 'http://<ADDRESS>/data/messages/?addMessage=1&send_name=<SENDERS NAME>&recieve_name=<RECIEVERS NAME>&pass=<SENDERS PASSWORD>&content=<MESSAGE CONTENT>
 def getMessage(request):
+	'''# in the url for the getMessage, add 'message'(for recieving message), 'addMessage' for adding new message, 'send_name' for sender id and 'recieve_name' for reciver id
+# url for adding messages - 'http://<ADDRESS>/data/messages/?addMessage=1&send_name=<SENDERS NAME>&recieve_name=<RECIEVERS NAME>&pass=<SENDERS PASSWORD>&content=<MESSAGE CONTENT>
+Input - HTTP request and Output-JSON response
+'''
         # get senders name and password from url for verification
         send_name=request.REQUEST['send_name']
         send_pass=request.REQUEST['pass']
@@ -128,8 +135,9 @@ def getMessage(request):
                 data='inexplicable error'
         return HttpResponse(data, mimetype="application/json")
 
-# url for setting unread - 'http://<ADDRESS>/data/setRead/?setStatus=1&send_name=<SENDERS NAME>&pass=<SENDERS PASSWORD>&message_id=<MESSAGE ID TO BE SET UNREAD>
+
 def setRead(request):
+	'''function for setting messages as read - 'http://<ADDRESS>/data/setRead/?setStatus=1&send_name=<SENDERS NAME>&pass=<SENDERS PASSWORD>&message_id=<MESSAGE ID TO BE SET UNREAD>'''
         send_name=request.REQUEST['send_name']
         send_pass=request.REQUEST['pass']
         if request.REQUEST.has_key('setStatus') and (authHelper(send_name,send_pass)==1):
@@ -138,17 +146,44 @@ def setRead(request):
                         for msd in d:
                                 msd.message_status=1
                                 msd.save()
-        data=msd.message_status
+                                data=msd.message_status
+        if request.REQUEST.has_key('setRecieveTime') and (authHelper(send_name,send_pass)==1):
+			d=message.objects.filter(id=request.REQUEST['message_id'])
+			if(len(d)>0):
+				for msd in d:
+					recieve_time=datetime.datetime.now()
+					msd.message_send_time=recieve_time
+					msd.save()
+					data=str(msd.message_recieve_time)+str(msd.message_send_time)
+					
         return HttpResponse(data, mimetype="application/json")
         
-                
-        
-##def deleteRead():
-##        d=message.objects.filter(message_id=1)
-##        for message in d:
-##                message.delete()
+def get_Unread(request):
+	'''Function to return number of new messages from all other users Input- Http request , Output - JSON response'''
+	new_messages=dict()
+	if (authHelper(request.REQUEST['u_name'],request.REQUEST['pass'])==1):
+		data=message.objects.filter(message_recieve=request.REQUEST['u_name'])
+		for d in data:
+			if(d.message_status==0):
+				if(str(d.message_send) in new_messages):
+					new_messages[str(d.message_send)]+=1
+				else:
+					new_messages[str(d.message_send)]=1
+	k=SignUp.objects.all()
+	for d in k:
+		if d.user_name == request.REQUEST['u_name']:
+			continue
+		if d.user_name in new_messages:
+			continue
+		else:
+			new_messages[str(d.user_name)]=0
+	
+	
+	print '{"fields": ' + str(json.dumps(new_messages)) + "}"
+	return HttpResponse('{"fields": ' + json.dumps(new_messages) + "}", mimetype = "application/json")
                 
 def authHelper(u_name,u_pass):
+	'''Function to match the passed username and password to check whether the given combination is valid or not'''
         result = 0
         d=SignUp.objects.filter(user_name=u_name)
         if len(d)>0:
@@ -158,3 +193,7 @@ def authHelper(u_name,u_pass):
                 result = 2
         return result
                                                                                                         
+## Gives datetime to the client if requested.
+def getTime(request):
+	'''Function that takes a HTTP request and returns the current server time in seconds'''
+	return HttpResponse('{"fields": '+str(time.mktime(datetime.datetime.now().timetuple()))+"}", mimetype = "application/json")

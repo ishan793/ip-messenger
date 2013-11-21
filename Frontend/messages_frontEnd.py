@@ -9,6 +9,7 @@ DATETIME_FORMAT2 = '%Y-%m-%d %H:%M:%S'
 
 #http://<ADDRESS>/data/messages/?addMessage=1&send_name=<SENDERS NAME>&recieve_name=<RECIEVERS NAME>&pass=<SENDERS PASSWORD>&content=<MESSAGE CONTENT>
 def getMessage(sender,reciever,passw):
+	'''function to get messages between a sender=receiver pair this function takes senders and receivers user name and receivers password (receiver being the client making request)'''
 	time=None
 	query_args = {'send_name':sender,'recieve_name':reciever,'pass':passw}
 	data = urllib.urlencode(query_args)
@@ -21,6 +22,7 @@ def getMessage(sender,reciever,passw):
 
 
 def addMessage(sender,reciever,passw,message):
+	'''function to send a new message takes senders and receivers user name and password as arguments and returns a dictionary with updated message in it'''  
     time=None
     query_args = {'send_name':sender,'recieve_name':reciever,'pass':passw,'content':message}
     data = urllib.urlencode(query_args)
@@ -31,10 +33,11 @@ def addMessage(sender,reciever,passw,message):
     
     return data['fields']
 
-## makes text file given the sender reciever
-# TODO: Check if extra getmessage can be removed by passsing messages
+
+
 def makeTextFile(sender,reciever,passw, messages):
-        text_file = open("messages/"+sender + "_"+ reciever , 'w')
+        '''makes text file given the sender receiver and sets message status as read on the server'''
+		text_file = open("messages/"+sender + "_"+ reciever , 'w')
         url_unread='http://192.168.7.250:8000/data/setRead/'
         for message in messages:
                 if sender==message['message_recieve_id'] and message['message_status']==0:
@@ -51,7 +54,9 @@ def makeTextFile(sender,reciever,passw, messages):
 
         
 def calculate_time(object): 
-        url='http://192.168.7.250:8000/data/gettime/'
+        '''function to return updates on when was the message recieved on the client
+		Input is send time of that message by other user and output is the when was the message recieved on this client'''
+		url='http://192.168.7.250:8000/data/gettime/'
         response = urllib.urlopen(url) 
         data = json.loads(response.read()) 
         t=int(data['fields']) 
@@ -63,6 +68,9 @@ def calculate_time(object):
           
           
         timegap = (t - time_sec - 60*330) 
+        #print time_sec, t, time.strftime(DATETIME_FORMAT2, time.localtime(time_sec)),time.strftime(DATETIME_FORMAT2, time.localtime(t-60*330)) 
+##        print timegap, str(datetime.datetime.strptime(tim, DATETIME_FORMAT).timetuple()) 
+##        print timegap/1000 
         limits = [0,60, 5*60, 70 * 60, 24*60*60] 
 ##        print limits 
           
