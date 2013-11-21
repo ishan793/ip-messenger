@@ -67,8 +67,8 @@ def calculate_time(object):
         except ValueError: 
                 time_sec=time.mktime(datetime.datetime.strptime(tim, DATETIME_FORMAT2).timetuple()) 
           
-          
-        timegap = abs(abs(t - time_sec) - 60*330)
+        time_sec+=60*330  
+        timegap = abs(t - time_sec)
         
         #print time_sec, t, time.strftime(DATETIME_FORMAT2, time.localtime(time_sec)),time.strftime(DATETIME_FORMAT2, time.localtime(t-60*330)) 
 ##        print timegap, str(datetime.datetime.strptime(tim, DATETIME_FORMAT).timetuple()) 
@@ -83,10 +83,10 @@ def calculate_time(object):
                 
                 return " few minutes ago "
         elif timegap <= limits[3] and timegap >= limits[2]:
-                a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.mktime(datetime.datetime.strptime(tim, DATETIME_FORMAT).timetuple())+60*330))
+                a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time_sec))
                 return " Today, " + str(a.split(' ')[1].split('.')[0]) 
         else : 
-                a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.mktime(datetime.datetime.strptime(tim, DATETIME_FORMAT).timetuple())+60*330))
+                a=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time_sec))
                 return tim.split(' ')[0]
 makeTextFile('ishan','mayank','ishan', getMessage('ishan','mayank','ishan'))
 
