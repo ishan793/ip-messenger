@@ -1,28 +1,28 @@
 # Function Definitions Guide for Graphical User Interface
-![GUI Overview Diagram](https://bitbucket.org/mshekhar/ipmessenger/master/GUI.png)
+![GUI Overview Diagram](https://bitbucket.org/mshekhar/ipmessenger/src/master/GUI.jpg)
 
 ## Class Chatscreen():
-This class creates the chat screen frame. The chat screen frame displays the text messages from the user whose screen has opened through a button in the parent frame. It also has a text control for sending messages
-  * Input: wx.Frame
+	This class creates the chat screen frame. The chat screen frame displays the text messages from the user whose screen has opened through a button in the parent frame. It also has a text control for sending messages
+    *	Input: wx.Frame
 
   1. __init__
   The function initializes the attributes of the chat screen frame and also calls all the functions required to define the properties of various frame controls. It also has subscriber initialised to run a thread continuously.
-  * Input: self, user, passw, friend, *args, **style
+    *	Input: self, user, passw, friend, *args, **style
   
   2. Method OnClose: Destroys the window
-  *	Inputs: self, event
+    *	Inputs: self, event
   
   3. Method __set_chatlog: Loads the text to display on the text control screen.
-  *	Inputs: self, msg1
+    *	Inputs: self, msg1
   
   4. Method __set_properties: Sets the properties of the text control frame.
-  *	Inputs: self
+    *	Inputs: self
   
   5. Method __do_layout: Sets the layout and properties of the sizer of the frame.
-  *	Inputs: self
+    *	Inputs: self
   
   6. Method text_e: Records the text entered in the text control box. Appends the text to the messages history. Also, loads the text screen again with the new messages.
-  *	Inputs: self, event
+    *	Inputs: self, event
 
 ## Class OnlineOfflineThread():
   This class initializes and runs a thread which updates the chatroom after every 10 seconds.
