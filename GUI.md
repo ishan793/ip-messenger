@@ -1,5 +1,5 @@
 # Function Definitions Guide for Graphical User Interface
-![GUI Overview Diagram](https://bitbucket.org/mshekhar/ipmessenger/raw/master/GUI.png)
+![GUI Overview Diagram](https://bitbucket.org/mshekhar/ipmessenger/master/GUI.png)
 
 ## Class Chatscreen():
 This class creates the chat screen frame. The chat screen frame displays the text messages from the user whose screen has opened through a button in the parent frame. It also has a text control for sending messages
